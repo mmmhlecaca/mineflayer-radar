@@ -6,7 +6,7 @@
     , drawInterval = setInterval(draw, 50)
     , botEntity
     , entities = {}
-  
+
   socket.on('entity', function (newEntity) {
     botEntity = newEntity;
   });
@@ -38,49 +38,47 @@
   imgArrow.src = '/arrow.png';
   imgBlueArrow.src = '/arrow-blue.png';
   imgRedArrow.src = '/arrow-red.png';
+
   function draw() {
-    if (! botEntity) return;
-    // fill with black
+    if (!botEntity) return;
+
+    // fill the canvas with black
     context.fillStyle = black;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // outer circle
-    context.strokeStyle = white;
-    context.beginPath();
-    context.arc(centerX, centerY, centerX, 0, 2 * Math.PI);
-    context.stroke();
-
-    // arrow in the middle that represents bot
+    // Draw the bot entity's arrow at the center
     context.save();
     context.translate(centerX, centerY);
     context.rotate(1.5 * Math.PI - botEntity.yaw);
     context.drawImage(imgArrow, 0, 0, 12, 12, -6, -6, 12, 12);
     context.restore();
 
-    // entities
+    // Draw entities (only players)
     for (var entityId in entities) {
       var entity = entities[entityId];
-      var x = centerX + xFromMc * (entity.position.x - botEntity.position.x);
-      var y = centerY + yFromMc * (entity.position.z - botEntity.position.z);
-      context.save();
-      context.translate(x, y);
-      context.rotate(1.5 * Math.PI - entity.yaw);
-      context.drawImage(imgBlueArrow, 0, 0, 12, 12, -6, -6, 12, 12);
-      context.restore();
 
-      context.fillStyle = white;
-      context.textBaseline = 'center';
-      context.fillText(entityText(entity), x, y - 20);
+      // Check if this entity is a player (by checking for a username)
+      if (entity.username) {
+        var x = centerX + xFromMc * (entity.position.x - botEntity.position.x);
+        var y = centerY + yFromMc * (entity.position.z - botEntity.position.z);
+        
+        context.save();
+        context.translate(x, y);
+        context.rotate(1.5 * Math.PI - entity.yaw);
+        context.drawImage(imgBlueArrow, 0, 0, 12, 12, -6, -6, 12, 12);
+        context.restore();
+
+        // Draw player username
+        context.fillStyle = white;
+        context.textBaseline = 'center';
+        context.fillText(entityText(entity), x, y - 20);
+      }
     }
-
-    // debug
-    context.fillStyle = white;
-    context.textBaseline = "top";
-    context.fillText("yaw: " + botEntity.yaw, 0, 0);
   }
 
+  // Function to display entity info (like username)
   function entityText(entity) {
-    return entity.username || entity.mobType || entity.objectType || entity.type;
+    return entity.username || '';  // Only show the username for players
   }
-}
+
 }());
