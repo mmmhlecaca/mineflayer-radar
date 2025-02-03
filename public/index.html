@@ -1,11 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <title>Mineflayer Radar</title>
+    <title>Radar</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Hide anything outside the focused area */
+      }
+      #canvas {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center the canvas */
+        border: 1px solid black;
+      }
+    </style>
   </head>
   <body>
     <canvas id="canvas" width="400" height="400"></canvas>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/app.js"></script>
+    <script>
+      const { remote } = require('electron');
+      const currentWindow = remote.getCurrentWindow();
+
+      // Function to focus on the canvas (resize and center window to the canvas area)
+      function focusOnCanvas() {
+        const canvas = document.getElementById('canvas');
+        const rect = canvas.getBoundingClientRect();
+
+        // Resize the window to match the canvas
+        currentWindow.setBounds({
+          x: rect.left, // Position the window to the left of the canvas
+          y: rect.top,  // Position the window to the top of the canvas
+          width: rect.width, // Window width is the canvas width
+          height: rect.height, // Window height is the canvas height
+        });
+
+        // Optional: You can disable window resizing to lock the window size
+        currentWindow.setResizable(false); // Disable resizing
+      }
+
+      // Focus on the canvas after the page is loaded
+      document.addEventListener('DOMContentLoaded', focusOnCanvas);
+    </script>
   </body>
 </html>
